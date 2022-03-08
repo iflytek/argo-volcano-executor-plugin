@@ -1,9 +1,13 @@
 name: Argo Volcano Plugin CI # 名字自取
 
 on:
+#  schedule:
+#    - cron: '0 10 * * *'
   push:
     branches:
       - master
+    tags:
+      - 'v*.*.*'
 
 jobs:
   docker:
@@ -26,5 +30,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags:
-           - berlinsaint/argo-volcano-plugin:latest
+          images: berlinsaint/argo-volcano-plugin
+          tags: |
+            type=ref,event=branch
+            type=sha
