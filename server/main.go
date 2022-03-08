@@ -9,7 +9,11 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog"
+)
 
+const (
+	// CLIName is the name of the CLI : argo volcano plugin
+	CLIName = "avp"
 )
 
 var logFlushFreq = pflag.Duration("log-flush-frequency", 5*time.Second, "Maximum number of seconds between log flushes")
@@ -27,25 +31,10 @@ func main() {
 	}
 
 	rootCmd.AddCommand(runServer())
-	rootCmd.AddCommand(versionCommand())
+	rootCmd.AddCommand(NewVersionCommand())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Printf("Failed to execute command: %v\n", err)
 		os.Exit(2)
 	}
-}
-
-var versionExample = `vp version`
-
-func versionCommand() *cobra.Command {
-	var command = &cobra.Command{
-		Use:     "version",
-		Short:   "Print the version information",
-		Long:    "Print the version information",
-		Example: versionExample,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("v0.1")
-		},
-	}
-	return command
 }
