@@ -7,23 +7,26 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"net/http"
 )
 
-func runServer() *cobra.Command{
+func runServer(config *options.Config) *cobra.Command {
 	rootCmd := cobra.Command{
 		Use:   "server",
 		Short: "argo volcano job plugin",
 		Long:  `a argo step that can run a volcano job`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := options.NewConfig()
+
+			pflag.Parse()
+			fmt.Println("### Listen on: ", config.Port)
 			return runPlugin(config)
 		},
 	}
 	return &rootCmd
 }
 
-func runPlugin(config *options.Config)  error{
+func runPlugin(config *options.Config) error {
 	restConfig, err := kube.BuildConfig(config.KubeClientOptions)
 	if err != nil {
 		return fmt.Errorf("unable to build k8s config: %v", err)

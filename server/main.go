@@ -1,6 +1,7 @@
 package main
 
 import (
+	"argo-volcano-executor-plugin/server/options"
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -30,7 +31,11 @@ func main() {
 		Use: "avp",
 	}
 
-	rootCmd.AddCommand(runServer())
+	config := options.NewConfig()
+	config.AddFlags(pflag.CommandLine)
+
+	rootCmd.AddCommand(runServer(config))
+
 	rootCmd.AddCommand(NewVersionCommand())
 
 	if err := rootCmd.Execute(); err != nil {
