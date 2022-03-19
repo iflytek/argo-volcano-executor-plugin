@@ -50,8 +50,8 @@ Todo here
 1. Clone the repository and change to the [`argo-plugin/`](argo-plugin/) directory:
 
    ```shell
-   git clone https://github.com/Shark/wasm-workflows-plugin
-   cd wasm-workflows-plugin/argo-plugin
+   git https://github.com/xfyun/argo-volcano-executor-plugin
+   cd argo-volcano-executor-plugin
    ```
 
 1. Build the plugin ConfigMap:
@@ -65,7 +65,7 @@ Todo here
    Ensure to specify `--namespace` if you didn't install Argo in the default namespace.
 
    ```shell
-   kubectl apply -f wasm-executor-plugin-configmap.yaml
+   kubectl apply -f volcano-executor-plugin-configmap.yaml
    ```
 
 ## Usage
@@ -146,25 +146,7 @@ spec:
 
 The `volcano` template will produce vcjob that you can use command `kubect get vcjob ` to browse them .
 
-```
-invoke: function(ctx: invocation) -> node
-```
 
-The contract defines one function `invoke` that the module must implement. `invoke` takes an `invocation` record and returns a `node` record (you can think of records as a structure holding some data). Most importantly, `invocation` holds the input parameters. `node` can specify whether the module executed successfully, provide a result message and can optionally return a list of output parameters.
-
-This repo contains a [ready-to-use template for Rust](wasm-modules/templates/rust/).
-
-### :construction: Capabilities
-
-Capabilities expand what modules can do. Without them, modules can take input parameters and artifacts and produce some output.
-
-Some [inspiration for capabilities](https://wasmcloud.dev/reference/host-runtime/capabilities/) can be taken from the wasmCloud project. Currently, this runtime does not offer any capabilities, but I want to port some of wasmCloud's capability providers over to enable a wide range of stateful use cases like HTTP/REST, S3 object storage, SQL databases, etc.
-
-### :construction: Distributed Mode
-
-Right now, all Wasm modules run in the plugin context -- in a single container This is fine for many use cases because Argo creates a new plugin context for every workflow instance. But the scaling is limited to a single node. For a full showcase of the vision of Cloud-Native WebAssembly, the workload should of course be distributed.
-
-### :construction: Module Source
 
 ## Roadmap
 
