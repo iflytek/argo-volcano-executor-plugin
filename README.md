@@ -14,7 +14,7 @@ As  [issue-7860](https://github.com/argoproj/argo-workflows/issues/7860) says:
 
 * Resources are strings, not structured YAML
 
-### 补充背景with volcano
+### Why this plugin?
 
 当前和volcano CRD JOB结合时有以下问题:
 
@@ -24,10 +24,7 @@ As  [issue-7860](https://github.com/argoproj/argo-workflows/issues/7860) says:
 * If volcano job status is success or failed, the success condition  or failedCondition is not
   very flexible in argo.
 
-
 So I have make this project:
-
-
 A specified Plugin for Volcano Job
 
 ### Built with
@@ -36,7 +33,11 @@ Open Source software stands on the shoulders of giants. It wouldn't have been po
 
 * [Gin](https://github.com/gin-gonic/gin) Golang HTTP FrameWork
 * [Volcano API]
+
+
 ## Getting Started
+
+Todo here
 
 ### Prerequisites
 
@@ -145,11 +146,6 @@ spec:
 
 The `volcano` template will produce vcjob that you can use command `kubect get vcjob ` to browse them .
 
-
-
-### Module Development
-
-
 ```
 invoke: function(ctx: invocation) -> node
 ```
@@ -170,21 +166,9 @@ Right now, all Wasm modules run in the plugin context -- in a single container T
 
 ### :construction: Module Source
 
-
-```yaml
-- name: wasm
-  plugin:
-    wasm:
-      module:
-        # you would use one of these options
-        oci: ghcr.io/someone/somemodule:latest    # already supported
-        wapm: syrusakbary/qr2text@0.0.1           # on the roadmap
-        bindle: example.com/stuff/mybindle/v1.2.3 # on the roadmap
-```
-
 ## Roadmap
 
-- [ ] Support config sa
+- [ ] Support config service account
 
 
 ## Contributing

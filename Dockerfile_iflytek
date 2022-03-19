@@ -1,4 +1,4 @@
-FROM  golang:1.17.7 as builder
+FROM  artifacts.iflytek.com/docker-private/atp/golang:1.17.7 as builder
 
 MAINTAINER ybyang7@iflytek.com
 WORKDIR /workspace
@@ -7,7 +7,7 @@ COPY . .
 
 RUN make
 
-FROM alpine:latest as prod
+FROM artifacts.iflytek.com/docker-private/atp/alpine:latest as prod
 ENV TZ Asia/Shanghai
 ENV BIN_NAME avp_linux_amd64
 RUN set -eux && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
@@ -19,3 +19,4 @@ COPY --from=0 /workspace/bin/linux .
 RUN chmod +x /root/${BIN_NAME}
 ENTRYPOINT ["/root/avp_linux_amd64"]
 CMD ["server"]
+
