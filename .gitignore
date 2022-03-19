@@ -1,2 +1,3 @@
-    bin/
-    .kube/
+bin/
+.kube/
+.idea
