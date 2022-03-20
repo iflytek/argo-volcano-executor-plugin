@@ -51,7 +51,7 @@ Todo here
 
    ```shell
    git https://github.com/xfyun/argo-volcano-executor-plugin
-   cd argo-volcano-executor-plugin
+   cd argo-volcano-executor-plugin/install
    ```
 
 1. Build the plugin ConfigMap:
@@ -145,6 +145,14 @@ spec:
 ```
 
 The `volcano` template will produce vcjob that you can use command `kubect get vcjob ` to browse them .
+
+## Current Issue
+
+Current Problem is that we can't use Release Argo Version.
+
+I modified the argo as [pr-8104](https://github.com/argoproj/argo-workflows/pull/8104) did.
+
+I will keep waiting for  the Plugin Authentication function's release.
 
 
 
