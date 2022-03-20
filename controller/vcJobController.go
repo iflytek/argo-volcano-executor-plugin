@@ -89,7 +89,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 
 	// 2. found and return
 	if exists {
-		klog.Info("# found exists Volcano Job: ", job.Name, "Returning Status...")
+		klog.Info("# found exists Volcano Job: ", job.Name, "returning Status...")
 		ct.ResponseVcJob(ctx, existsJob)
 		return
 	}
@@ -182,6 +182,7 @@ func (ct *Controller) Response404(ctx *gin.Context) {
 }
 
 func InjectVcJobWithWorkflowName(job *batch.Job, workflowName string) {
+	var newTasks []batch.TaskSpec
 	for _, task := range job.Spec.Tasks {
 		if task.Template.ObjectMeta.Labels != nil {
 			task.Template.ObjectMeta.Labels[LabelKeyWorkflow] = workflowName
@@ -190,5 +191,8 @@ func InjectVcJobWithWorkflowName(job *batch.Job, workflowName string) {
 				LabelKeyWorkflow: workflowName,
 			}
 		}
+		newTasks = append(newTasks, task)
 	}
+	klog.Info("Injecting Labels with workflow name:", workflowName)
+	job.Spec.Tasks = newTasks
 }
