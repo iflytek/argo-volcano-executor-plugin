@@ -1,0 +1,31 @@
+# This is an auto-generated file. DO NOT EDIT
+apiVersion: v1
+data:
+  sidecar.container: |
+    image: artifacts.iflytek.com/docker-private/atp/argo-volcano-executor-plugin:v300536
+    name:  volcano-executor-plugin
+    args:
+      - server
+      - --port
+      - 8080
+    ports:
+    - containerPort: 8080
+    resources:
+      limits:
+        cpu: "1"
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsGroup: 0
+      runAsUser: 0
+      runAsNonRoot: false
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    workflows.argoproj.io/configmap-type: ExecutorPlugin
+  name: volcano-executor-plugin
+  namespace: argo

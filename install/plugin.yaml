@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ExecutorPlugin
+metadata:
+  name: volcano
+spec:
+  sidecar:
+    container:
+      image: artifacts.iflytek.com/docker-private/atp/argo-volcano-executor-plugin:v299816
+      name: volcano-executor-plugin
+      args:
+        - server
+        - --port
+        - 8080
+      ports:
+        - containerPort: 8080
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534 # nobody
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "512Mi"
+          cpu: "1"
