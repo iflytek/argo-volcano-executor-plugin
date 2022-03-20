@@ -70,7 +70,7 @@ Todo here
 
 ## Usage
 
-Now that the plugin is registered in Argo, you can run workflow steps as Wasm modules by simply calling the `wasm` plugin:
+Now that the plugin is registered in Argo, you can run workflow steps as Volcano modules by simply calling the `volcano` plugin:
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
