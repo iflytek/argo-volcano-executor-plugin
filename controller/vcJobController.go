@@ -14,6 +14,10 @@ import (
 	"volcano.sh/apis/pkg/client/clientset/versioned"
 )
 
+const (
+	LabelKeyWorkflow string = "workflows.argoproj.io/workflow"
+)
+
 type Controller struct {
 	VcClient   *versioned.Clientset
 	KubeClient *kubernetes.Clientset
@@ -89,6 +93,9 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		ct.ResponseVcJob(ctx, existsJob)
 		return
 	}
+
+	// 3.Label keys with workflow Name
+	InjectVcJobWithWorkflowName(job, c.Workflow.ObjectMeta.Name)
 
 	newJob, err := ct.VcClient.BatchV1alpha1().Jobs(job.Namespace).Create(ctx, job, metav1.CreateOptions{})
 	if err != nil {
@@ -172,4 +179,16 @@ func (ct *Controller) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
 func (ct *Controller) Response404(ctx *gin.Context) {
 	ctx.AbortWithStatus(http.StatusNotFound)
 
+}
+
+func InjectVcJobWithWorkflowName(job *batch.Job, workflowName string) {
+	for _, task := range job.Spec.Tasks {
+		if task.Template.ObjectMeta.Labels != nil {
+			task.Template.ObjectMeta.Labels[LabelKeyWorkflow] = workflowName
+		} else {
+			task.Template.ObjectMeta.Labels = map[string]string{
+				LabelKeyWorkflow: workflowName,
+			}
+		}
+	}
 }

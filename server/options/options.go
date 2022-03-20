@@ -24,9 +24,9 @@ import (
 )
 
 const (
-	defaultQPS              = 50.0
-	defaultBurst            = 100
-	defaultPluginName    = "volcano"
+	defaultQPS        = 50.0
+	defaultBurst      = 100
+	defaultPluginName = "volcano"
 )
 
 // Config admission-controller server config.
@@ -37,7 +37,7 @@ type Config struct {
 	CaCertFile        string
 	Port              int
 	PrintVersion      bool
-	PluginName     string
+	PluginName        string
 	ConfigPath        string
 }
 
@@ -55,14 +55,14 @@ func (c *Config) AddFlags(fs *pflag.FlagSet) {
 		"File containing the default x509 Certificate for HTTPS. (CA cert, if any, concatenated "+
 		"after server cert).")
 	fs.StringVar(&c.KeyFile, "tls-private-key-file", c.KeyFile, "File containing the default x509 private key matching --tls-cert-file.")
-	fs.IntVar(&c.Port, "port", 8443, "the port used by admission-controller-server.")
+	fs.IntVar(&c.Port, "port", 8443, "the port used by argo volcano plugin.")
 	fs.BoolVar(&c.PrintVersion, "version", false, "Show version and quit")
 	fs.Float32Var(&c.KubeClientOptions.QPS, "kube-api-qps", defaultQPS, "QPS to use while talking with kubernetes apiserver")
 	fs.IntVar(&c.KubeClientOptions.Burst, "kube-api-burst", defaultBurst, "Burst to use while talking with kubernetes apiserver")
 
 	fs.StringVar(&c.CaCertFile, "ca-cert-file", c.CaCertFile, "File containing the x509 Certificate for HTTPS.")
 
-	fs.StringVar(&c.ConfigPath, "plugin-conf", "", "The configmap file of this plugin")
+	//fs.StringVar(&c.ConfigPath, "plugin-conf", "", "The configmap file of this plugin")
 }
 
 // CheckPortOrDie check valid port range.
