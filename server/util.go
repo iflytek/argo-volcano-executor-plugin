@@ -5,7 +5,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/klog"
 	"volcano.sh/apis/pkg/client/clientset/versioned"
-
 )
 
 // getKubeClient Get a clientset with restConfig.
@@ -20,6 +19,7 @@ func getKubeClient(restConfig *rest.Config) *kubernetes.Clientset {
 // GetVolcanoClient get a clientset for volcano.
 func getVolcanoClient(restConfig *rest.Config) *versioned.Clientset {
 	clientset, err := versioned.NewForConfig(restConfig)
+	klog.Info(clientset.ServerVersion())
 	if err != nil {
 		klog.Fatal(err)
 	}

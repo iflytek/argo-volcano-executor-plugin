@@ -32,7 +32,6 @@ type VolcanoPluginBody struct {
 }
 
 func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
-	klog.Info("#####starting......")
 	c := &executorplugins.ExecuteTemplateArgs{}
 	err := ctx.BindJSON(&c)
 	if err != nil {
@@ -45,6 +44,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		},
 	}
 	pluginJson, _ := c.Template.Plugin.MarshalJSON()
+	klog.Info("Receive: ", string(pluginJson))
 	err = json.Unmarshal(pluginJson, inputBody)
 	if err != nil {
 		klog.Error(err)
@@ -61,6 +61,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		return
 	}
 
+	// Todo here , Basic Check For Job here If Need.
 	if jobSpec.MaxRetry < 0 {
 		msg = "'maxRetry' cannot be less than zero."
 		klog.Error(msg)
@@ -104,19 +105,16 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		return
 	}
 
-	if newJob.Spec.Queue == "" {
-		newJob.Spec.Queue = "default"
-	}
-	ct.ResponseCreated(ctx)
+	ct.ResponseCreated(ctx, newJob)
 
 }
 
-func (ct *Controller) ResponseCreated(ctx *gin.Context) {
+func (ct *Controller) ResponseCreated(ctx *gin.Context, job *batch.Job) {
 
 	ctx.JSON(http.StatusOK, &executorplugins.ExecuteTemplateReply{
 		Node: &wfv1.NodeResult{
 			Phase:   wfv1.NodePending,
-			Message: "",
+			Message: job.Status.State.Message,
 			Outputs: nil,
 		},
 		Requeue: &metav1.Duration{
