@@ -1,6 +1,7 @@
 # This is an auto-generated file. DO NOT EDIT
 apiVersion: v1
 data:
+  sidecar.automountServiceAccountToken: "true"
   sidecar.container: |
     image: artifacts.iflytek.com/docker-private/atp/argo-volcano-executor-plugin:v300536
     name:  volcano-executor-plugin

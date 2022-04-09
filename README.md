@@ -54,19 +54,22 @@ Todo here
    cd argo-volcano-executor-plugin/install
    ```
 
-1. Build the plugin ConfigMap:
-
+2. Build the plugin ConfigMap: [you can also directly edit volcano-executor-plugin-configmap.yaml]
+   
    ```shell
+   # This step is not required if don't understand here...
    argo executor-plugin build .
    ```
 
-1. Register the plugin with Argo in your cluster:
+3. Register the plugin with Argo in your cluster:
 
    Ensure to specify `--namespace` if you didn't install Argo in the default namespace.
 
    ```shell
    kubectl apply -f volcano-executor-plugin-configmap.yaml
    ```
+
+4. other rbac config and sa config  in  [rbac_dir](install/rbac)
 
 ## Usage
 
@@ -148,17 +151,19 @@ The `volcano` template will produce vcjob that you can use command `kubect get v
 
 ## Current Issue && Limits
 
-Current Problem is that we can't use Release Argo Version.
-
+you need the argo version > v3.3.1 [not include v3.3.1]
 I modified the argo as [pr-8104](https://github.com/argoproj/argo-workflows/pull/8104) did.
 
-I will keep waiting for  the Plugin Authentication function's release.
 
+
+## Tested Argo Version
+
+v0.0.0-dev-mc-9
 
 
 ## Roadmap
 
-- [ ] Support config service account
+- [ * ] Support config service account
 
 
 ## Contributing
