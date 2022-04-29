@@ -24,7 +24,7 @@ type Controller struct {
 }
 
 type JobBody struct {
-	JobSpec *batch.JobSpec `json:"job"`
+	Job *batch.Job `json:"job"`
 }
 
 type VolcanoPluginBody struct {
@@ -40,7 +40,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 	}
 	inputBody := &VolcanoPluginBody{
 		JobBody: &JobBody{
-			JobSpec: &batch.JobSpec{},
+			Job: &batch.Job{},
 		},
 	}
 	pluginJson, _ := c.Template.Plugin.MarshalJSON()
@@ -53,7 +53,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 
 	}
 	var msg string
-	jobSpec := inputBody.JobBody.JobSpec
+	jobSpec := inputBody.JobBody.Job.Spec
 	if jobSpec.MinAvailable < 0 {
 		msg = "job 'minAvailable' must be >= 0."
 		klog.Error(msg)
@@ -68,13 +68,10 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		ct.ResponseMsg(ctx, wfv1.NodeFailed, msg)
 		return
 	}
-	job := &batch.Job{
-		Spec: *jobSpec,
-		ObjectMeta: metav1.ObjectMeta{
-			Name: c.Workflow.ObjectMeta.Name,
-		},
-	}
-	if job.Namespace == "" {
+	job := inputBody.JobBody.Job
+	job.ObjectMeta.Name = c.Workflow.ObjectMeta.Name
+
+	if job.ObjectMeta.Namespace == "" {
 		job.Namespace = "default"
 	}
 
