@@ -41,7 +41,10 @@ Todo here
 
 ### Prerequisites
 
-* This guide assumes you have a working Argo Workflows installation with v3.3.0 or newer.
+* This guide assumes you have a working Argo Workflows installation with v3.3.4 or newer.
+* rely on pr: [pr-8194](https://github.com/argoproj/argo-workflows/pull/8194)
+*  rely on pr: [pr-8176](https://github.com/argoproj/argo-workflows/pull/8176)
+    
 * You will need to install the [Argo CLI](https://argoproj.github.io/argo-workflows/cli/) with v3.3.0 or newer.
 * `kubectl` must be available and configured to access the Kubernetes cluster where Argo Workflows is installed.
 
@@ -86,65 +89,78 @@ spec:
   templates:
     - name: main
       executor:
-        serviceAccountName: default
+        serviceAccountName: volcano-executor-plugin
       plugin:
         volcano:
           job:
-            minAvailable: 3
-            schedulerName: volcano
-            plugins:
-              env: []
-              svc: []
-            queue: default
-            policies:
-              - event: PodEvicted
-                action: RestartJob
-              - event: TaskCompleted
-                action: CompleteJob
-            tasks:
-              - replicas: 1
-                name: ps
-                template:
-                  spec:
-                    containers:
-                      - command:
-                          - sh
-                          - -c
-                          - |
-                            PS_HOST=`cat /etc/volcano/ps.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
-                            WORKER_HOST=`cat /etc/volcano/worker.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
-                            export TF_CONFIG={\"cluster\":{\"ps\":[${PS_HOST}],\"worker\":[${WORKER_HOST}]},\"task\":{\"type\":\"ps\",\"index\":${VK_TASK_INDEX}},\"environment\":\"cloud\"};
-                            python /var/tf_dist_mnist/dist_mnist.py
-                        image: volcanosh/dist-mnist-tf-example:0.0.1
-                        name: tensorflow
-                        ports:
-                          - containerPort: 2222
-                            name: tfjob-port
-                        resources: {}
-                    restartPolicy: Never
-              - replicas: 2
-                name: worker
-                policies:
-                  - event: TaskCompleted
-                    action: CompleteJob
-                template:
-                  spec:
-                    containers:
-                      - command:
-                          - sh
-                          - -c
-                          - |
-                            PS_HOST=`cat /etc/volcano/ps.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
-                            WORKER_HOST=`cat /etc/volcano/worker.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
-                            export TF_CONFIG={\"cluster\":{\"ps\":[${PS_HOST}],\"worker\":[${WORKER_HOST}]},\"task\":{\"type\":\"worker\",\"index\":${VK_TASK_INDEX}},\"environment\":\"cloud\"};
-                            python /var/tf_dist_mnist/dist_mnist.py
-                        image: volcanosh/dist-mnist-tf-example:0.0.1
-                        name: tensorflow
-                        ports:
-                          - containerPort: 2222
-                            name: tfjob-port
-                        resources: {}
-                    restartPolicy: Never
+            apiVersion: batch.volcano.sh/v1alpha1
+            kind: Job
+            metadata:
+              name: "{{workflow.name}}"
+              namespace: "{{workflow.namespace}}"
+              ownerReferences:
+                - apiVersion: argoproj.io/v1alpha1
+                  blockOwnerDeletion: true
+                  controller: true
+                  kind: Workflow
+                  name: "{{workflow.name}}"
+                  uid: "{{workflow.uid}}"
+            spec:
+              minAvailable: 3
+              schedulerName: volcano
+              plugins:
+                env: []
+                svc: []
+              queue: default
+              policies:
+                - event: PodEvicted
+                  action: RestartJob
+                - event: TaskCompleted
+                  action: CompleteJob
+              tasks:
+                - replicas: 1
+                  name: ps
+                  template:
+                    spec:
+                      containers:
+                        - command:
+                            - sh
+                            - -c
+                            - |
+                              PS_HOST=`cat /etc/volcano/ps.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
+                              WORKER_HOST=`cat /etc/volcano/worker.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
+                              export TF_CONFIG={\"cluster\":{\"ps\":[${PS_HOST}],\"worker\":[${WORKER_HOST}]},\"task\":{\"type\":\"ps\",\"index\":${VK_TASK_INDEX}},\"environment\":\"cloud\"};
+                              python /var/tf_dist_mnist/dist_mnist.py
+                          image: volcanosh/dist-mnist-tf-example:0.0.1
+                          name: tensorflow
+                          ports:
+                            - containerPort: 2222
+                              name: tfjob-port
+                          resources: {}
+                      restartPolicy: Never
+                - replicas: 2
+                  name: worker
+                  policies:
+                    - event: TaskCompleted
+                      action: CompleteJob
+                  template:
+                    spec:
+                      containers:
+                        - command:
+                            - sh
+                            - -c
+                            - |
+                              PS_HOST=`cat /etc/volcano/ps.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
+                              WORKER_HOST=`cat /etc/volcano/worker.host | sed 's/$/&:2222/g' | sed 's/^/"/;s/$/"/' | tr "\n" ","`;
+                              export TF_CONFIG={\"cluster\":{\"ps\":[${PS_HOST}],\"worker\":[${WORKER_HOST}]},\"task\":{\"type\":\"worker\",\"index\":${VK_TASK_INDEX}},\"environment\":\"cloud\"};
+                              python /var/tf_dist_mnist/dist_mnist.py
+                          image: volcanosh/dist-mnist-tf-example:0.0.1
+                          name: tensorflow
+                          ports:
+                            - containerPort: 2222
+                              name: tfjob-port
+                          resources: {}
+                      restartPolicy: Never
 ```
 
 The `volcano` template will produce vcjob that you can use command `kubect get vcjob ` to browse them .
