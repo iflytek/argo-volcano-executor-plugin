@@ -15,8 +15,8 @@ import (
 var jsonData []byte
 
 type Item struct {
-	Name   string    `json:"name"`
-	ItemId int `json:"item_id"`
+	Name   string `json:"name"`
+	ItemId int    `json:"item_id"`
 }
 
 type JobBody struct {
@@ -27,10 +27,8 @@ type VolcanoPluginBody struct {
 }
 
 type Items struct {
-	Items  Item `json:"items"`
+	Items Item `json:"items"`
 }
-
-
 
 func TestJsonUnmarshal(t *testing.T) {
 
@@ -74,5 +72,7 @@ func TestSjunmar(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v\n", item)
+
+	newJson, err := json.Marshal(item)
+	fmt.Printf(string(newJson))
 }

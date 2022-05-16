@@ -41,7 +41,6 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		return
 	}
 	// Get workflow First
-
 	inputBody := &VolcanoPluginBody{
 		JobBody: &JobBody{
 			Job: &batch.Job{},

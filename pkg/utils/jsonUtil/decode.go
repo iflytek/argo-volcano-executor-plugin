@@ -20,7 +20,7 @@ func UnmarshalFromMap(in interface{}, template interface{}) error {
 }
 
 var (
-	bytesType = reflect.TypeOf([]byte(nil))
+	bytesType     = reflect.TypeOf([]byte(nil))
 	jsonUnmarshal = reflect.TypeOf(json.Unmarshaler(nil))
 )
 
@@ -33,7 +33,6 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 
 		return nil
 	}
-
 
 	switch {
 	// 目标是字节数组
@@ -55,7 +54,6 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 
 	}
 
-
 	switch v.Kind() {
 	case reflect.Ptr:
 		if v.IsNil() {
@@ -66,11 +64,11 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 			default:
 				nv = reflect.New(elemType)
 			}
-			mar ,ok :=  v.Interface().(json.Unmarshaler)
-			if ok{
-				inb,_  := json.Marshal(in)
+			mar, ok := v.Interface().(json.Unmarshaler)
+			if ok {
+				inb, _ := json.Marshal(in)
 				err := mar.UnmarshalJSON(inb)
-				if err != nil{
+				if err != nil {
 					return err
 				}
 				return nil
@@ -82,11 +80,11 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 			v.Set(nv)
 			return nil
 		}
-		mar ,ok :=  v.Interface().(json.Unmarshaler)
-		if ok{
-			inb,_  := json.Marshal(in)
+		mar, ok := v.Interface().(json.Unmarshaler)
+		if ok {
+			inb, _ := json.Marshal(in)
 			err := mar.UnmarshalJSON(inb)
-			if err != nil{
+			if err != nil {
 				return err
 			}
 			return nil
@@ -129,7 +127,7 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 			newV = reflect.MakeMap(v.Type())
 		}
 		keyType := t.Key()
-		if keyType.Kind() != reflect.String{
+		if keyType.Kind() != reflect.String {
 			panic("map key type is not string")
 		}
 
@@ -165,14 +163,18 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 		for i := 0; i < t.NumField(); i++ {
 			fieldT := t.Field(i)
 			name := fieldT.Tag.Get("json")
-			ti := strings.Index(name,",")
-			if ti >= 0 {
-				name =name[:ti]
-			}
+			tagsOpts := strings.Split(name, ",")
+			name = tagsOpts[0]
 			if name == "" {
 				name = fieldT.Name
 			}
-			if fieldT.Anonymous {
+			inline := false
+			for _, tag := range tagsOpts[1:] {
+				if tag == "inline" {
+					inline = true
+				}
+			}
+			if fieldT.Anonymous && inline {
 				err := unmarshalObject2Struct(name, in, v.Field(i))
 				if err != nil {
 					return err
@@ -269,8 +271,8 @@ func intValueOf(v interface{}) (int64, error) {
 	case int64:
 		return int64(t), nil
 	case string:
-		i ,err :=  strconv.Atoi(t)
-		return int64(i),err
+		i, err := strconv.Atoi(t)
+		return int64(i), err
 	default:
 		return 0, fmt.Errorf("type is %v ,not int ", reflect.TypeOf(v))
 	}
@@ -298,7 +300,7 @@ func floatValueOf(v interface{}) (float64, error) {
 	case float64:
 		return v, nil
 	case string:
-		return strconv.ParseFloat(v,64)
+		return strconv.ParseFloat(v, 64)
 	default:
 		return 0, fmt.Errorf("invalid float value:%v", v)
 	}
