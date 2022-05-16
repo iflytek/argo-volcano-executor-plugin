@@ -178,7 +178,7 @@ I modified the argo as [pr-8104](https://github.com/argoproj/argo-workflows/pull
 
 ## Tested Argo Version
 
-v0.0.0-dev-mc-9
+v3.3.5 or newer
 
 
 ## Roadmap
