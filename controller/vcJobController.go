@@ -2,6 +2,7 @@ package controller
 
 import (
 	"argo-volcano-executor-plugin/pkg/utils/jsonUtil"
+	"encoding/json"
 	wfv1 "github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	argoversioned "github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned"
 	executorplugins "github.com/argoproj/argo-workflows/v3/pkg/plugins/executor"
@@ -47,8 +48,16 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		},
 	}
 	pluginJson, _ := c.Template.Plugin.MarshalJSON()
+	var object interface{}
+	err = json.Unmarshal(pluginJson, &object)
+	if err != nil {
+		klog.Error(err)
+		ct.Response404(ctx)
+		return
+
+	}
 	klog.Info("Receive: ", string(pluginJson))
-	err = jsonUtil.UnmarshalFromMap(pluginJson, inputBody)
+	err = jsonUtil.UnmarshalFromMap(object, inputBody)
 	//err = json.Unmarshal(pluginJson, inputBody)
 	if err != nil {
 		klog.Error(err)
