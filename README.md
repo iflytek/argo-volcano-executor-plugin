@@ -39,13 +39,17 @@ Open Source software stands on the shoulders of giants. It wouldn't have been po
 
 Todo here
 
+
 ### Prerequisites
 
-* This guide assumes you have a working Argo Workflows installation with v3.3.4 or newer.
+~~* This guide assumes you have a working Argo Workflows installation with v3.3.4 or newer.~~
 * rely on pr: [pr-8194](https://github.com/argoproj/argo-workflows/pull/8194)
 *  rely on pr: [pr-8176](https://github.com/argoproj/argo-workflows/pull/8176)
     
-* You will need to install the [Argo CLI](https://argoproj.github.io/argo-workflows/cli/) with v3.3.0 or newer.
+~~* You will need to install the [Argo CLI](https://argoproj.github.io/argo-workflows/cli/) with v3.3.0 or newer.~~
+
+You just need argo version with v3.3.5 or newer if fully supported ...
+
 * `kubectl` must be available and configured to access the Kubernetes cluster where Argo Workflows is installed.
 
 ### Installation
