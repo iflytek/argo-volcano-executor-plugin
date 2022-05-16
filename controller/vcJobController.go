@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"encoding/json"
+	"argo-volcano-executor-plugin/pkg/utils/jsonUtil"
 	wfv1 "github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
+	argoversioned "github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned"
 	executorplugins "github.com/argoproj/argo-workflows/v3/pkg/plugins/executor"
 	"github.com/gin-gonic/gin"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,12 +22,12 @@ const (
 type Controller struct {
 	VcClient   *versioned.Clientset
 	KubeClient *kubernetes.Clientset
+	ArgoClient *argoversioned.Clientset
 }
 
 type JobBody struct {
 	Job *batch.Job `json:"job"`
 }
-
 type VolcanoPluginBody struct {
 	JobBody *JobBody `json:"volcano"`
 }
@@ -38,6 +39,8 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 		klog.Error(err)
 		return
 	}
+	// Get workflow First
+
 	inputBody := &VolcanoPluginBody{
 		JobBody: &JobBody{
 			Job: &batch.Job{},
@@ -45,7 +48,8 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 	}
 	pluginJson, _ := c.Template.Plugin.MarshalJSON()
 	klog.Info("Receive: ", string(pluginJson))
-	err = json.Unmarshal(pluginJson, inputBody)
+	err = jsonUtil.UnmarshalFromMap(pluginJson, inputBody)
+	//err = json.Unmarshal(pluginJson, inputBody)
 	if err != nil {
 		klog.Error(err)
 		ct.Response404(ctx)
@@ -190,4 +194,8 @@ func InjectVcJobWithWorkflowName(job *batch.Job, workflowName string) {
 	}
 	klog.Info("Injecting Labels with workflow name:", workflowName)
 	job.Spec.Tasks = newTasks
+}
+
+func GetWorkflowByName(name string) {
+
 }

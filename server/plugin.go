@@ -35,9 +35,11 @@ func runPlugin(config *options.Config) error {
 
 	vcClient := getVolcanoClient(restConfig)
 	kubeClient := getKubeClient(restConfig)
+	argoClient := getArgoClient(restConfig)
 
 	ct.VcClient = vcClient
 	ct.KubeClient = kubeClient
+	ct.ArgoClient = argoClient
 
 	router := gin.Default()
 
