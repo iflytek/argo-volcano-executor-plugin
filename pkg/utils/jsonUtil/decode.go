@@ -2,9 +2,11 @@ package jsonUtil
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"unsafe"
 )
 
@@ -19,6 +21,7 @@ func UnmarshalFromMap(in interface{}, template interface{}) error {
 
 var (
 	bytesType = reflect.TypeOf([]byte(nil))
+	jsonUnmarshal = reflect.TypeOf(json.Unmarshaler(nil))
 )
 
 func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error {
@@ -30,6 +33,7 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 
 		return nil
 	}
+
 
 	switch {
 	// 目标是字节数组
@@ -51,6 +55,7 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 
 	}
 
+
 	switch v.Kind() {
 	case reflect.Ptr:
 		if v.IsNil() {
@@ -61,11 +66,29 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 			default:
 				nv = reflect.New(elemType)
 			}
+			mar ,ok :=  v.Interface().(json.Unmarshaler)
+			if ok{
+				inb,_  := json.Marshal(in)
+				err := mar.UnmarshalJSON(inb)
+				if err != nil{
+					return err
+				}
+				return nil
+			}
 			err := unmarshalObject2Struct(path, in, nv.Elem())
 			if err != nil {
 				return err
 			}
 			v.Set(nv)
+			return nil
+		}
+		mar ,ok :=  v.Interface().(json.Unmarshaler)
+		if ok{
+			inb,_  := json.Marshal(in)
+			err := mar.UnmarshalJSON(inb)
+			if err != nil{
+				return err
+			}
 			return nil
 		}
 		return unmarshalObject2Struct(path, in, v.Elem())
@@ -105,18 +128,35 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 		if v.IsNil() {
 			newV = reflect.MakeMap(v.Type())
 		}
+		keyType := t.Key()
+		if keyType.Kind() != reflect.String{
+			panic("map key type is not string")
+		}
+
 		for key, val := range vmap {
 			elemV := reflect.New(elemT)
 			err := unmarshalObject2Struct(key, val, elemV)
 			if err != nil {
 				return err
 			}
-			newV.SetMapIndex(reflect.ValueOf(key), elemV.Elem())
+			kk := reflect.New(keyType).Elem()
+			kk.SetString(key)
+			newV.SetMapIndex(kk, elemV.Elem())
 		}
 		v.Set(newV)
 		return nil
 	case reflect.Struct:
 		t := v.Type()
+
+		//mar ,ok :=  v.Interface().(json.Unmarshaler)
+		//if ok{
+		//	inb,_  := json.Marshal(in)
+		//	err := mar.UnmarshalJSON(inb)
+		//	if err != nil{
+		//		return err
+		//	}
+		//	return nil
+		//}
 
 		vmap, ok := in.(map[string]interface{})
 		if !ok {
@@ -125,6 +165,10 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 		for i := 0; i < t.NumField(); i++ {
 			fieldT := t.Field(i)
 			name := fieldT.Tag.Get("json")
+			ti := strings.Index(name,",")
+			if ti >= 0 {
+				name =name[:ti]
+			}
 			if name == "" {
 				name = fieldT.Name
 			}

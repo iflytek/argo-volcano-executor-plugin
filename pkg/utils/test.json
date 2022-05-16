@@ -1,0 +1,116 @@
+{
+  "volcano": {
+    "job": {
+      "apiVersion": "batch.volcano.sh/v1alpha1",
+      "kind": "Job",
+      "metadata": {
+        "name": "horovod-agent-2m620",
+        "namespace": "aiyx",
+        "ownerReferences": [{
+          "apiVersion": "argoproj.io/v1alpha1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Workflow",
+          "name": "horovod-agent-2m620",
+          "uid": "2e618df9-7f6e-4f61-b7c3-3ea267988c40"
+        }]
+      },
+      "spec": {
+        "minAvailable": "2",
+        "plugins": {
+          "ssh": [],
+          "svc": []
+        },
+        "policies": [{
+          "action": "RestartJob",
+          "event": "PodEvicted"
+        }],
+        "queue": "default",
+        "schedulerName": "volcano",
+        "tasks": [{
+          "name": "master",
+          "policies": [{
+            "action": "CompleteJob",
+            "event": "TaskCompleted"
+          }],
+          "replicas": "1",
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "train-core",
+                "workflows.argoproj.io/workflow": "horovod-agent-2m620"
+              }
+            },
+            "spec": {
+              "containers": [{
+                "command": ["/bin/sh", "-c", "WORKER_HOST=`cat /etc/volcano/worker.host | awk 'ORS=\":1,\"'|head -c -1`;\nmkdir -p /var/run/sshd; /usr/sbin/sshd;\nCURRENT=$(date +\"%Y%m%d\")\n#CURRENT=20220217\necho $CURRENT\nTRAIN_COMMAND=\"horovodrun --log-level INFO  -np 1 -H ${WORKER_HOST} \"\nTRAIN_COMMAND=$TRAIN_COMMAND\necho ${WORKER_HOST}\neval $TRAIN_COMMAND python /work/code/deepfm_algo/test.py --data_path /work/data/tfrecords_infoflow_algo/data --featmap_path /work/data/tfrecords_infoflow_algo/featMap/part-00000  --checkpoint_path /work/model/deepfm_infoflow_algo/deepfm_v1 --start_date 20220418 --embed_dim 4 --input_length 60 --end_delta 7 --learning_rate 0.0002\n  \n"],
+                "env": [{
+                  "name": "CUDA_VISIBLE_DEVICES",
+                  "value": "-1"
+                }],
+                "image": "artifacts.iflytek.com/docker-private/atp/horovod-cpu:master",
+                "name": "tensorflow",
+                "ports": [{
+                  "containerPort": 22,
+                  "name": "job-port"
+                }],
+                "resources": {
+                  "limits": {
+                    "cpu": "12000m"
+                  },
+                  "requests": {
+                    "cpu": "1000m",
+                    "memory": "1024Mi"
+                  }
+                }
+              }],
+              "nodeSelector": {
+                "type": "cpu"
+              },
+              "restartPolicy": "OnFailure"
+            }
+          }
+        }, {
+          "name": "worker",
+          "replicas": "1",
+          "template": {
+            "metadata": {
+              "labels": {
+                "app": "train-core",
+                "project_id": "73bba207-9a4e-4085-86aa-7a1f0d40752b",
+                "workflows.argoproj.io/workflow": "horovod-agent-2m620"
+              }
+            },
+            "spec": {
+              "containers": [{
+                "command": ["/bin/sh", "-c", "mkdir -p /var/run/sshd; /usr/sbin/sshd -D;\n"],
+                "env": [{
+                  "name": "CUDA_VISIBLE_DEVICES",
+                  "value": "-1"
+                }],
+                "image": "artifacts.iflytek.com/docker-private/atp/horovod-cpu:master",
+                "name": "worker",
+                "ports": [{
+                  "containerPort": 22,
+                  "name": "job-port"
+                }],
+                "resources": {
+                  "limits": {
+                    "cpu": "10000m"
+                  },
+                  "requests": {
+                    "cpu": "4000m"
+                  }
+                }
+              }],
+              "nodeSelector": {
+                "type": "cpu"
+              },
+              "restartPolicy": "OnFailure"
+            }
+          }
+        }]
+      }
+    }
+  }
+}
