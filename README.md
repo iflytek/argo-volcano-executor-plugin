@@ -48,7 +48,7 @@ Todo here
     
 ~~* You will need to install the [Argo CLI](https://argoproj.github.io/argo-workflows/cli/) with v3.3.0 or newer.~~
 
-You just need argo version with v3.3.5 or newer if fully supported ...
+You just need argo version with v3.3.5 or newer , they are fully supported ...
 
 * `kubectl` must be available and configured to access the Kubernetes cluster where Argo Workflows is installed.
 
