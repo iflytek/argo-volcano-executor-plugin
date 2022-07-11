@@ -31,7 +31,8 @@
           "name": "master",
           "policies": [{
             "action": "CompleteJob",
-            "event": "TaskCompleted"
+            "event": "TaskCompleted",
+            "timeout": "30s"
           }],
           "replicas": "1",
           "template": {
