@@ -64,7 +64,7 @@ func unmarshalObject2Struct(path string, in interface{}, v reflect.Value) error 
 			default:
 				nv = reflect.New(elemType)
 			}
-			mar, ok := v.Interface().(json.Unmarshaler)
+			mar, ok := nv.Interface().(json.Unmarshaler)
 			if ok {
 				inb, _ := json.Marshal(in)
 				err := mar.UnmarshalJSON(inb)
