@@ -157,6 +157,8 @@ func (ct *Controller) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
 		status = wfv1.NodePending
 	case batch.Failed:
 		status = wfv1.NodeFailed
+	case batch.Terminated:
+		status = wfv1.NodeFailed
 	default:
 		status = wfv1.NodeRunning
 	}
