@@ -21,7 +21,7 @@ tag-release:
   only:
     - tags
   tags:
-    - atp
+    - k8s
 # 研测环境基于develop分支自动CI
 test-build-dev:
   stage: build
@@ -31,6 +31,6 @@ test-build-dev:
   only:
     - master
   tags:
-  - atp
+  - k8s
 
 
