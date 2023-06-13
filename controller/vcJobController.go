@@ -174,7 +174,7 @@ func (ct *Controller) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
 	// not sure here
 	Total := job.Status.Failed + job.Status.Succeeded + job.Status.Running
 	progress, _ := wfv1.NewProgress(int64(succeed), int64(Total))
-	klog.Info("### Job Status " + job.Status.State.Message)
+	klog.Info("### Job Phase "+job.Status.State.Phase+", status", status)
 
 	ctx.JSON(http.StatusOK, &executorplugins.ExecuteTemplateReply{
 		Node: &wfv1.NodeResult{
