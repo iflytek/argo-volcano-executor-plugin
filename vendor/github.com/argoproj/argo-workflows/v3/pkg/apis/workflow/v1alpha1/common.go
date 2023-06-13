@@ -36,6 +36,12 @@ type TemplateReferenceHolder interface {
 	GetTemplateRef() *TemplateRef
 	// GetTemplateName returns the template name. This maybe empty. This is last precedence.
 	GetTemplateName() string
+	// GetName returns the name of the template reference holder.
+	GetName() string
+	// IsDAGTask returns true if the template reference is a DAGTask.
+	IsDAGTask() bool
+	// IsWorkflowStep returns true if the template reference is a WorkflowStep.
+	IsWorkflowStep() bool
 }
 
 // SubmitOpts are workflow submission options
@@ -48,8 +54,6 @@ type SubmitOpts struct {
 	Entrypoint string `json:"entryPoint,omitempty" protobuf:"bytes,4,opt,name=entrypoint"`
 	// Parameters passes input parameters to workflow
 	Parameters []string `json:"parameters,omitempty" protobuf:"bytes,5,rep,name=parameters"`
-	// ParameterFile holds a reference to a parameter file. This option is not supported in API
-	ParameterFile string `json:"parameterFile,omitempty" protobuf:"bytes,6,opt,name=parameterFile"`
 	// ServiceAccount runs all pods in the workflow using specified ServiceAccount.
 	ServiceAccount string `json:"serviceAccount,omitempty" protobuf:"bytes,7,opt,name=serviceAccount"`
 	// DryRun validates the workflow on the client-side without creating it. This option is not supported in API

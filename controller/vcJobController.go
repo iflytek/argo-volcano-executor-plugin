@@ -100,7 +100,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 
 	// 2. found and return
 	if exists {
-		klog.Info("# found exists Volcano Job: ", job.Name, "returning Status...")
+		klog.Info("# found exists Volcano Job: ", job.Name, "returning Status...", job.Status)
 		ct.ResponseVcJob(ctx, existsJob)
 		return
 	}
@@ -174,6 +174,7 @@ func (ct *Controller) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
 	// not sure here
 	Total := job.Status.Failed + job.Status.Succeeded + job.Status.Running
 	progress, _ := wfv1.NewProgress(int64(succeed), int64(Total))
+	klog.Info("### Job Status " + job.Status.State.Message)
 
 	ctx.JSON(http.StatusOK, &executorplugins.ExecuteTemplateReply{
 		Node: &wfv1.NodeResult{
