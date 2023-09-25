@@ -82,7 +82,10 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 	}
 	job := inputBody.JobBody.Job
 	klog.Info(job.Spec.Tasks)
-	job.ObjectMeta.Name = c.Workflow.ObjectMeta.Name
+	if job.Name == "" {
+		job.ObjectMeta.Name = c.Workflow.ObjectMeta.Name
+
+	}
 
 	if job.ObjectMeta.Namespace == "" {
 		job.Namespace = "default"
