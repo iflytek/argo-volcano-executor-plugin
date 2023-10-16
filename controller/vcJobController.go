@@ -20,7 +20,7 @@ const (
 	LabelKeyWorkflow string = "workflows.argoproj.io/workflow"
 )
 
-type Controller struct {
+type VCController struct {
 	VcClient   *versioned.Clientset
 	KubeClient *kubernetes.Clientset
 	ArgoClient *argoversioned.Clientset
@@ -33,7 +33,7 @@ type VolcanoPluginBody struct {
 	JobBody *JobBody `json:"volcano"`
 }
 
-func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
+func (ct *VCController) ExecuteVolcanoJob(ctx *gin.Context) {
 	c := &executorplugins.ExecuteTemplateArgs{}
 	err := ctx.BindJSON(&c)
 	if err != nil {
@@ -122,7 +122,7 @@ func (ct *Controller) ExecuteVolcanoJob(ctx *gin.Context) {
 
 }
 
-func (ct *Controller) ResponseCreated(ctx *gin.Context, job *batch.Job) {
+func (ct *VCController) ResponseCreated(ctx *gin.Context, job *batch.Job) {
 
 	ctx.JSON(http.StatusOK, &executorplugins.ExecuteTemplateReply{
 		Node: &wfv1.NodeResult{
@@ -136,7 +136,7 @@ func (ct *Controller) ResponseCreated(ctx *gin.Context, job *batch.Job) {
 	})
 }
 
-func (ct *Controller) ResponseMsg(ctx *gin.Context, status wfv1.NodePhase, msg string) {
+func (ct *VCController) ResponseMsg(ctx *gin.Context, status wfv1.NodePhase, msg string) {
 	ctx.JSON(http.StatusOK, &executorplugins.ExecuteTemplateReply{
 		Node: &wfv1.NodeResult{
 			Phase:   status,
@@ -146,7 +146,7 @@ func (ct *Controller) ResponseMsg(ctx *gin.Context, status wfv1.NodePhase, msg s
 	})
 }
 
-func (ct *Controller) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
+func (ct *VCController) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
 	jobPhase := &job.Status.State.Phase
 	var status wfv1.NodePhase
 	switch *jobPhase {
@@ -190,7 +190,7 @@ func (ct *Controller) ResponseVcJob(ctx *gin.Context, job *batch.Job) {
 	})
 }
 
-func (ct *Controller) Response404(ctx *gin.Context) {
+func (ct *VCController) Response404(ctx *gin.Context) {
 	ctx.AbortWithStatus(http.StatusNotFound)
 
 }

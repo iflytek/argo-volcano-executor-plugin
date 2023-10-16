@@ -4,6 +4,7 @@ import (
 	"argo-volcano-executor-plugin/controller"
 	"argo-volcano-executor-plugin/pkg/kube"
 	"argo-volcano-executor-plugin/server/options"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -26,12 +27,32 @@ func runServer(config *options.Config) *cobra.Command {
 	return &rootCmd
 }
 
-func runPlugin(config *options.Config) error {
+func runK8sPlugin(config *options.Config) error {
+	//todo
+	if config.PluginName != options.K8sPluginName {
+		return errors.New("Not valid plugin name. must be k8s here.")
+	}
 	restConfig, err := kube.BuildConfig(config.KubeClientOptions)
 	if err != nil {
 		return fmt.Errorf("unable to build k8s config: %v", err)
 	}
-	ct := &controller.Controller{}
+	ct := &controller.K8sController{}
+	kubeClient := getKubeClient(restConfig)
+	ct.KubeClient = kubeClient
+
+	return nil
+}
+
+func runPlugin(config *options.Config) error {
+
+	if config.PluginName == options.K8sPluginName {
+		return runK8sPlugin(config)
+	}
+	restConfig, err := kube.BuildConfig(config.KubeClientOptions)
+	if err != nil {
+		return fmt.Errorf("unable to build k8s config: %v", err)
+	}
+	ct := &controller.VCController{}
 
 	vcClient := getVolcanoClient(restConfig)
 	kubeClient := getKubeClient(restConfig)

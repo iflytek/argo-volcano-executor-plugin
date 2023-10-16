@@ -26,7 +26,8 @@ import (
 const (
 	defaultQPS        = 50.0
 	defaultBurst      = 100
-	defaultPluginName = "volcano"
+	DefaultPluginName = "volcano"
+	K8sPluginName     = "k8s"
 )
 
 // Config admission-controller server config.
