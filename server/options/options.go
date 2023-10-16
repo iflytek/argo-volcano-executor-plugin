@@ -60,6 +60,7 @@ func (c *Config) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&c.PrintVersion, "version", false, "Show version and quit")
 	fs.Float32Var(&c.KubeClientOptions.QPS, "kube-api-qps", defaultQPS, "QPS to use while talking with kubernetes apiserver")
 	fs.IntVar(&c.KubeClientOptions.Burst, "kube-api-burst", defaultBurst, "Burst to use while talking with kubernetes apiserver")
+	fs.StringVar(&c.PluginName, "plugin-name", "volcano", "volcano/k8s")
 
 	fs.StringVar(&c.CaCertFile, "ca-cert-file", c.CaCertFile, "File containing the x509 Certificate for HTTPS.")
 
