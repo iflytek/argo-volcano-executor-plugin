@@ -39,14 +39,27 @@ func runK8sPlugin(config *options.Config) error {
 	ct := &controller.K8sController{}
 	kubeClient := getKubeClient(restConfig)
 	ct.KubeClient = kubeClient
+	router := gin.Default()
 
-	return nil
+	// Query string parameters are parsed using the existing underlying request object.
+	// The request responds to a url matching:  /welcome?firstname=Jane&lastname=Doe
+	router.GET("/welcome", func(c *gin.Context) {
+		firstname := c.DefaultQuery("firstname", "Guest")
+		lastname := c.Query("lastname") // shortcut for c.Request.URL.Query().Get("lastname")
+
+		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
+	})
+	router.POST("/api/v1/template.execute", ct.ExecuteK8sJob)
+	return router.Run(fmt.Sprintf(":%d", config.Port))
 }
 
 func runPlugin(config *options.Config) error {
 
 	if config.PluginName == options.K8sPluginName {
-		return runK8sPlugin(config)
+		err := runK8sPlugin(config)
+		if err != nil {
+			return fmt.Errorf("k8s_plugin ruanfailed: %v", err)
+		}
 	}
 	restConfig, err := kube.BuildConfig(config.KubeClientOptions)
 	if err != nil {

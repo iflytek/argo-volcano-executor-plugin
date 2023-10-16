@@ -27,7 +27,7 @@ type K8sPluginBody struct {
 	JobBody *K8sJobBody `json:"k8s"`
 }
 
-func (ct *K8sController) ExecuteVolcanoJob(ctx *gin.Context) {
+func (ct *K8sController) ExecuteK8sJob(ctx *gin.Context) {
 	c := &executorplugins.ExecuteTemplateArgs{}
 	err := ctx.BindJSON(&c)
 	if err != nil {
