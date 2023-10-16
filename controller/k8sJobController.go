@@ -126,13 +126,6 @@ func (ct *K8sController) ResponseK8sJob(ctx *gin.Context, job *batchv1.Job) {
 	var requeue *metav1.Duration
 	var status wfv1.NodePhase
 
-	if status == wfv1.NodeRunning || status == wfv1.NodePending {
-		requeue = &metav1.Duration{
-			Duration: 10 * time.Second,
-		}
-	} else {
-		requeue = nil
-	}
 	for _, condition := range job.Status.Conditions {
 		if condition.Type == batchv1.JobComplete && condition.Status == corev1.ConditionTrue {
 			// Job 完成
